@@ -1,0 +1,70 @@
+version: "3"
+services:
+  apache:
+    container_name: 'Apache'
+    image: httpd:latest
+    volumes:
+      - './:/var/www/html/'
+    ports:
+      - '80:80'
+
+  nfs-server:
+    container_name: 'Servidor_nfs'
+    image: atlassian/nfs-server-test:latest
+    volumes:
+      - './:/vagrant'
+    ports:
+      - '2049:2049'
+    privileged: true
+    restart: always
+
+  ftp-container:
+    volumes:
+        - './:/home/vagrant'
+    ports:
+        - '20:20'
+        - '21:21'
+    environment:
+        - FTP_USER=teste
+        - FTP_PASS=teste123
+        - PASV_ADDRESS=10.0.
+    container_name: 'Servidor_ftp'
+    image: ustclug/ftp:latest
+
+  dns:
+     image: ubuntu/bind9:latest
+     container_name: 'DNS'
+     volumes:
+       - './dns/named.conf:/etc/bind/named.conf'
+       - './dns/resolv.conf:/etc/resolv.conf'
+     restart: always
+     networks:
+       sua-rede:
+         ipv4_address: 192.168.100.7
+
+  dhcpd:
+    # docker-compose settings
+    build:
+      context: .
+    container_name: 'Servidor DHCP'
+    network_mode: bridge
+    # docker swarm settings
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+    # general settings
+    ports:
+      - '67:67/udp'
+    volumes:
+      - './:/data/dhcpd'
+    restart: always
+
+
+networks:
+  sua-rede:
+    driver: bridge
+    ipam: 
+        config:
+           - subnet: 192.168.100.0/24 
+
