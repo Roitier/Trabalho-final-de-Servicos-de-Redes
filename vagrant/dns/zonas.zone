@@ -1,0 +1,16 @@
+$TTL 86400
+
+@ IN SOA zona.teste. admin.zona.teste. (
+    2023062301 ; Serial
+    86400      ; Refresh
+    7200       ; Retry
+    3600000    ; Expire
+    86400      ; Minimum TTL
+    )
+
+IN      NS      zona.teste.
+
+DNS     IN      A       192.168.100.3
+Servidor_DHCP     IN      A       192.168.100.4
+
+www     IN      A       192.168.100.10

@@ -4,7 +4,7 @@ services:
     container_name: 'Apache'
     image: httpd:latest
     volumes:
-      - './:/var/www/html/'
+      - './html/teste.html:/usr/local/apache2/htdocs'
     ports:
       - '80:80'
 
@@ -36,17 +36,18 @@ services:
      container_name: 'DNS'
      volumes:
        - './dns/named.conf:/etc/bind/named.conf'
+       - './dns/zonas.zone:/etc/bind/zonas.zone'
        - './dns/resolv.conf:/etc/resolv.conf'
      restart: always
      networks:
-       sua-rede:
+       rede:
          ipv4_address: 192.168.100.7
 
   dhcpd:
     # docker-compose settings
     build:
       context: .
-    container_name: 'Servidor DHCP'
+    container_name: 'Servidor_DHCP'
     network_mode: bridge
     # docker swarm settings
     deploy:
@@ -60,11 +61,9 @@ services:
       - './:/data/dhcpd'
     restart: always
 
-
 networks:
-  sua-rede:
+  rede:
     driver: bridge
     ipam: 
         config:
            - subnet: 192.168.100.0/24 
-
